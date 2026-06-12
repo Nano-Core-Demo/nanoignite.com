@@ -53,6 +53,11 @@ jobs:
           $env:KUBERNETES_CLUSTER = az aks list -g $env:AZURE_GROUP_KUBERNETES --query [0].name -o tsv;
           az aks get-credentials -g $env:AZURE_GROUP_KUBERNETES -n $env:KUBERNETES_CLUSTER --overwrite -o none;
 
+      - run: |
+          which docker
+          docker version
+          ls -la /var/run/docker.sock
+
       - name: Publish Image
         shell: pwsh
         run: |
