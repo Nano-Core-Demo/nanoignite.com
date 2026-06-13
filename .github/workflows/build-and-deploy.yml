@@ -28,7 +28,7 @@ env:
   KUBERNETES_MEMORY_LIMIT: 96Mi
   KUBERNETES_CPU_REQUEST: 50m
   KUBERNETES_CPU_LIMIT: 150m
-#  AA: ${{ env.CONTAINER_REGISTRY_HOST }}/${{ github.repository_owner }}/
+  FULL_IMAGE_NAME: ${{ env.CONTAINER_REGISTRY_HOST }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -45,18 +45,14 @@ jobs:
       - name: Publish Image
         shell: pwsh
         run: |
-          echo "AAA";
-          echo ${{ github.repository }};
-          echo ${{ github.repository_owner }};
-  
-          $owner = "${{ github.repository_owner }}".ToLower()
-          $registryHost = $env:CONTAINER_REGISTRY_HOST.ToLower()
-          $imageLatestTag = $registryHost + "/" + $owner + "/" + $env:IMAGE_NAME + ":latest";
-          $imageVersionTag = $registryHost + "/" + $owner + "/" + $env:IMAGE_NAME + ":" + $env:VERSION
+          #$owner = "${{ github.repository_owner }}".ToLower()
+          #$registryHost = $env:CONTAINER_REGISTRY_HOST.ToLower()
+          #$imageLatestTag = $registryHost + "/" + $owner + "/" + $env:IMAGE_NAME + ":latest";
+          #$imageVersionTag = $registryHost + "/" + $owner + "/" + $env:IMAGE_NAME + ":" + $env:VERSION
           
           docker build `
-              -t $imageLatestTag `
-              -t $imageVersionTag `
+              -t $env:FULL_IMAGE_NAME + ":latest" `
+              -t $env:FULL_IMAGE_NAME + ":" + $env:VERSION `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=$env:CONTAINER_REGISTRY_SOURCE_LABEL `
               ./;
 
