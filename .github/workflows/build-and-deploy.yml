@@ -44,9 +44,10 @@ jobs:
       - name: Publish Image
         shell: pwsh
         run: |
+          $owner = "${{ github.repository_owner }}".ToLower()
           $registryHost = $env:CONTAINER_REGISTRY_HOST.ToLower()
-          $imageLatestTag = $registryHost + "/" + $env:IMAGE_NAME + ":latest";
-          $imageVersionTag = $registryHost + "/" + $env:IMAGE_NAME + ":" + $env:VERSION
+          $imageLatestTag = $registryHost + "/" + $owner + "/" + $env:IMAGE_NAME + ":latest";
+          $imageVersionTag = $registryHost + "/" + $owner + "/" + $env:IMAGE_NAME + ":" + $env:VERSION
           
           docker build `
               -t $imageLatestTag `
