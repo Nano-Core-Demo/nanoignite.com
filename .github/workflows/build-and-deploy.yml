@@ -120,15 +120,15 @@ jobs:
               throw "error";
           }
 
-          Get-Content .kubernetes/grafana-httproute-80.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/grafana-httproute-80.tmp.yaml;
+          Get-Content .kubernetes/httproute-80.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/httproute-80.tmp.yaml;
           kubectl apply -f .kubernetes/grafana-httproute-80.tmp.yaml;
           if ($LastExitCode -ne 0) 
           { 
               throw "error";
           }
 
-          Get-Content .kubernetes/grafana-httproute-443.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/grafana-httproute-443.tmp.yaml;
-          kubectl apply -f .kubernetes/grafana-httproute-443.tmp.yaml;
+          Get-Content .kubernetes/httproute-443.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/httproute-443.tmp.yaml;
+          kubectl apply -f .kubernetes/httproute-443.tmp.yaml;
           if ($LastExitCode -ne 0) 
           { 
               throw "error";
