@@ -1,13 +1,13 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: %SERVICE_NAME%-route
+  name: %SERVICE_NAME%-route-443
   namespace: %KUBERNETES_NAMESPACE%
 spec:
   parentRefs:
     - name: %SERVICE_NAME%-gateway
   hostnames:
-    - %DOMAIN_NAME%
+%ROUTE_HOST_NAMES%
   rules:
     - matches:
         - path:

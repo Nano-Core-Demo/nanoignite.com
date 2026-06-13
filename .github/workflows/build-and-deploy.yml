@@ -21,15 +21,14 @@ env:
   CONTAINER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   CONTAINER_REGISTRY_SOURCE_LABEL: https://github.com/${{ github.repository }}
   KUBERNETES_NODEPOOL_COMPUTE: cpu
-  KUBERNETES_NAMESPACE: commercial
+  KUBERNETES_NAMESPACE: apps
   KUBERNETES_REPLICA_COUNT: ${{ github.ref == 'refs/heads/master' && 2 || 1 }}
   KUBERNETES_REPLICA_HISTORY_COUNT: 0
   KUBERNETES_MEMORY_REQUEST: 32Mi   
   KUBERNETES_MEMORY_LIMIT: 96Mi
   KUBERNETES_CPU_REQUEST: 50m
   KUBERNETES_CPU_LIMIT: 150m
-  DOMAIN_NAME: web.vivetonline.com
-  CERTIFICATE_ORGANIZATION: Nano Ignite
+  SUB_DOMAIN: web
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -96,10 +95,17 @@ jobs:
       - name: Kubernetes Deploy
         shell: pwsh
         run: |
-          $env:KUBERNETES_CLUSTER = az aks list -g $env:AZURE_GROUP_KUBERNETES --query [0].name -o tsv;
           $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
 
-          kubectl create namespace $env:KUBERNETES_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -;
+          $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
+
+          $env:ROUTE_HOST_NAMES = (
+              $zoneNames | ForEach-Object {
+                  "  - $env:SUB_DOMAIN.$_"
+              }
+          ) -join "`n"          
+
+          $env:GATEWAY_NAME = kubectl get gateway -n apps -o jsonpath='{.items[0].metadata.name}'
 
           Get-Content .kubernetes/service.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/service.tmp.yaml;
           kubectl apply -f .kubernetes/service.tmp.yaml;
@@ -110,20 +116,6 @@ jobs:
 
           Get-Content .kubernetes/deployment.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/deployment.tmp.yaml;
           kubectl apply -f .kubernetes/deployment.tmp.yaml;
-          if ($LastExitCode -ne 0) 
-          { 
-              throw "error";
-          }
-
-          Get-Content .kubernetes/gateway.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/gateway.tmp.yaml;
-          kubectl apply -f .kubernetes/gateway.tmp.yaml;
-          if ($LastExitCode -ne 0) 
-          { 
-              throw "error";
-          }
-
-          Get-Content .kubernetes/certificate.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/certificate.tmp.yaml;
-          kubectl apply -f .kubernetes/certificate.tmp.yaml;
           if ($LastExitCode -ne 0) 
           { 
               throw "error";
