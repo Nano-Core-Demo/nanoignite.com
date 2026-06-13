@@ -5,10 +5,10 @@ metadata:
   namespace: %KUBERNETES_NAMESPACE%
 spec:
   parentRefs:
-    - name: %GATEWAY_NAME%
+    - name: %SERVICE_NAME%-gateway
       sectionName: http
   hostnames:
-    - %ROUTE_HOST_NAME%
+    - %DOMAIN_NAME%
   rules:
     - filters:
         - type: RequestRedirect
