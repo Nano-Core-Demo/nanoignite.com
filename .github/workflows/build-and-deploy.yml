@@ -67,8 +67,6 @@ jobs:
               throw "error";
           };  
 
-          echo "FULL_IMAGE_NAME=$env:FULL_IMAGE_NAME" >> $env:GITHUB_ENV;
-
   deploy:
     runs-on:
       - self-hosted
@@ -97,6 +95,8 @@ jobs:
       - name: Kubernetes Deploy
         shell: pwsh
         run: |
+          $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
+
           $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
 
           $env:ROUTE_HOST_NAMES = (
