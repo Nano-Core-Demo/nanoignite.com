@@ -8,7 +8,7 @@ spec:
     - name: %GATEWAY_NAME%
       sectionName: http
   hostnames:
-%ROUTE_HOST_NAMES%
+    - %ROUTE_HOST_NAME%
   rules:
     - filters:
         - type: RequestRedirect

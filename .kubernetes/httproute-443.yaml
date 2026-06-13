@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - name: %GATEWAY_NAME%
   hostnames:
-%ROUTE_HOST_NAMES%
+    - %ROUTE_HOST_NAME%
   rules:
     - matches:
         - path:

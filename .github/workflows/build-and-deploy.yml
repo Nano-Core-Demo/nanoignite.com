@@ -28,6 +28,7 @@ env:
   KUBERNETES_MEMORY_LIMIT: 96Mi
   KUBERNETES_CPU_REQUEST: 50m
   KUBERNETES_CPU_LIMIT: 150m
+  ROUTE_HOST_NAME: web.vivetonline.com
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -96,13 +97,13 @@ jobs:
         run: |
           $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
 
-          $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
+          # $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
 
-          $env:ROUTE_HOST_NAMES = (
-              $zoneNames | ForEach-Object {
-                  "  - $_"
-              }
-          ) -join "`n"
+          # $env:ROUTE_HOST_NAMES = (
+          #     $zoneNames | ForEach-Object {
+          #         "  - $_"
+          #     }
+          # ) -join "`n"          
 
           $env:GATEWAY_NAME = kubectl get gateway -n apps -o jsonpath='{.items[0].metadata.name}'
 
