@@ -45,11 +45,10 @@ jobs:
         shell: pwsh
         run: |
           $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
-          echo "AAA";
-          echo $env:FULL_IMAGE_NAME;
+
           docker build `
               -t $env:FULL_IMAGE_NAME:latest `
-              -t $env:FULL_IMAGE_NAME:$env:VERSION `
+              -t $env:FULL_IMAGE_NAME:$($env:VERSION) `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=$env:CONTAINER_REGISTRY_SOURCE_LABEL `
               ./;
 
