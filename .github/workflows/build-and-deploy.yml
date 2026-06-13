@@ -28,7 +28,6 @@ env:
   KUBERNETES_MEMORY_LIMIT: 96Mi
   KUBERNETES_CPU_REQUEST: 50m
   KUBERNETES_CPU_LIMIT: 150m
-  FULL_IMAGE_NAME: ${{ env.CONTAINER_REGISTRY_HOST }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
 jobs:
   build:
     runs-on: ubuntu-latest
