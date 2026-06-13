@@ -21,7 +21,7 @@ env:
   CONTAINER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   CONTAINER_REGISTRY_SOURCE_LABEL: https://github.com/${{ github.repository }}
   KUBERNETES_NODEPOOL_COMPUTE: cpu
-  KUBERNETES_NAMESPACE: apps
+  KUBERNETES_NAMESPACE: ${{ vars.KUBERNETES_NAMESPACE }}
   KUBERNETES_REPLICA_COUNT: ${{ github.ref == 'refs/heads/master' && 2 || 1 }}
   KUBERNETES_REPLICA_HISTORY_COUNT: 0
   KUBERNETES_MEMORY_REQUEST: 32Mi   
@@ -67,6 +67,8 @@ jobs:
               throw "error";
           };  
 
+          echo "FULL_IMAGE_NAME=$env:FULL_IMAGE_NAME" >> $env:GITHUB_ENV;
+
   deploy:
     runs-on:
       - self-hosted
@@ -95,8 +97,6 @@ jobs:
       - name: Kubernetes Deploy
         shell: pwsh
         run: |
-          $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
-
           $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
 
           $env:ROUTE_HOST_NAMES = (
