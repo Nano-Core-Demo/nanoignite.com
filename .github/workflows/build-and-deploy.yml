@@ -39,7 +39,7 @@ jobs:
       packages: write
       id-token: write
     concurrency:
-      group: ${{ github.repository }}
+      group: build-${{ github.repository }}
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v6
@@ -77,7 +77,7 @@ jobs:
       packages: write
       id-token: write
     concurrency:
-      group: ${{ github.repository }}
+      group: deploy-${{ github.repository }}
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v6
