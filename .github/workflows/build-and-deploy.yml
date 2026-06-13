@@ -30,10 +30,7 @@ env:
   KUBERNETES_CPU_LIMIT: 150m
 jobs:
   build:
-    runs-on:
-      - self-hosted
-      - linux 
-      - ${{ github.ref == 'refs/heads/master' && 'Production' || 'Staging' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
@@ -71,7 +68,11 @@ jobs:
           };  
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux 
+      - ${{ github.ref == 'refs/heads/master' && 'Production' || 'Staging' }}
+    needs: build
     permissions:
       contents: write
       packages: write
