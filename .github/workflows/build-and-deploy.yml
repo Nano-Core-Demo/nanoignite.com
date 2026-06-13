@@ -142,8 +142,9 @@ jobs:
           name: "Release ${{ env.VERSION }}"
           body: |
             Version: ${{ env.VERSION }}
+            Image: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             Commit: ${{ github.sha }}
-          artifacts: "nupkgs/*"
+            Build run: ${{ github.run_number }}
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: false
           prerelease: false
