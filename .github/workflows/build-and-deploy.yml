@@ -44,14 +44,11 @@ jobs:
       - name: Publish Image
         shell: pwsh
         run: |
-          #$owner = "${{ github.repository_owner }}".ToLower()
-          #$registryHost = $env:CONTAINER_REGISTRY_HOST.ToLower()
-          #$imageLatestTag = $registryHost + "/" + $owner + "/" + $env:IMAGE_NAME + ":latest";
-          #$imageVersionTag = $registryHost + "/" + $owner + "/" + $env:IMAGE_NAME + ":" + $env:VERSION
-          
+          $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
+          echo $env:FULL_IMAGE_NAME;
           docker build `
-              -t $env:FULL_IMAGE_NAME + ":latest" `
-              -t $env:FULL_IMAGE_NAME + ":" + $env:VERSION `
+              -t $env:FULL_IMAGE_NAME:latest" `
+              -t $env:FULL_IMAGE_NAME:$env:VERSION `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=$env:CONTAINER_REGISTRY_SOURCE_LABEL `
               ./;
 
@@ -96,6 +93,8 @@ jobs:
       - name: Kubernetes Deploy
         shell: pwsh
         run: |
+          $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
+
           $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
 
           $env:ROUTE_HOST_NAMES = (
