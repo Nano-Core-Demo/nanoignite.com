@@ -96,6 +96,7 @@ jobs:
       - name: Kubernetes Deploy
         shell: pwsh
         run: |
+          $env:KUBERNETES_CLUSTER = az aks list -g $env:AZURE_GROUP_KUBERNETES --query [0].name -o tsv;
           $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
 
           kubectl create namespace $env:KUBERNETES_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -;
