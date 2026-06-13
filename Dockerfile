@@ -13,6 +13,8 @@ COPY images/ /usr/share/nginx/html/images/
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+RUN sed -i 's|pid\s*/var/run/nginx.pid;|pid /tmp/nginx.pid;|' /etc/nginx/nginx.conf
+
 EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
