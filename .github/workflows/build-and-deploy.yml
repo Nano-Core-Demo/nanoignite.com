@@ -29,6 +29,7 @@ env:
   KUBERNETES_CPU_REQUEST: 50m
   KUBERNETES_CPU_LIMIT: 150m
   ROUTE_HOST_NAME: web.vivetonline.com
+  CERTIFICATE_ORGANIZATION: Nano Ignite
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -116,6 +117,13 @@ jobs:
 
           Get-Content .kubernetes/deployment.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/deployment.tmp.yaml;
           kubectl apply -f .kubernetes/deployment.tmp.yaml;
+          if ($LastExitCode -ne 0) 
+          { 
+              throw "error";
+          }
+
+          Get-Content .kubernetes/certificate.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/certificate.tmp.yaml;
+          kubectl apply -f .kubernetes/certificate.tmp.yaml;
           if ($LastExitCode -ne 0) 
           { 
               throw "error";
