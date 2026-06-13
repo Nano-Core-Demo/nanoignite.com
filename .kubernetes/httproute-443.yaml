@@ -5,7 +5,7 @@ metadata:
   namespace: %KUBERNETES_NAMESPACE%
 spec:
   parentRefs:
-    - name: %SERVICE_NAME%-gateway
+    - name: %GATEWAY_NAME%
   hostnames:
 %ROUTE_HOST_NAMES%
   rules:
