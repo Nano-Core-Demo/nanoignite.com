@@ -28,6 +28,7 @@ env:
   KUBERNETES_MEMORY_LIMIT: 96Mi
   KUBERNETES_CPU_REQUEST: 50m
   KUBERNETES_CPU_LIMIT: 150m
+#  AA: ${{ env.CONTAINER_REGISTRY_HOST }}/${{ github.repository_owner }}/
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,6 +45,10 @@ jobs:
       - name: Publish Image
         shell: pwsh
         run: |
+          echo "AAA";
+          echo ${{ github.repository }};
+          echo ${{ github.repository_owner }};
+  
           $owner = "${{ github.repository_owner }}".ToLower()
           $registryHost = $env:CONTAINER_REGISTRY_HOST.ToLower()
           $imageLatestTag = $registryHost + "/" + $owner + "/" + $env:IMAGE_NAME + ":latest";
