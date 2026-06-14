@@ -29,16 +29,15 @@ env:
   KUBERNETES_CPU_REQUEST: 50m
   KUBERNETES_CPU_LIMIT: 150m
   SUB_DOMAIN: web
+concurrency:
+  group: ${{ github.workflow }}-${{ github.repository }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
-      id-token: write
-    concurrency:
-      group: build-${{ github.repository }}
-      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v6
 
@@ -59,6 +58,7 @@ jobs:
           };
 
           echo $env:CONTAINER_REGISTRY_PASSWORD | docker login $env:CONTAINER_REGISTRY_HOST -u $env:CONTAINER_REGISTRY_USERNAME --password-stdin;
+
           docker push "$($env:FULL_IMAGE_NAME):latest";
           docker push "$($env:FULL_IMAGE_NAME):$($env:VERSION)";
 
@@ -77,9 +77,6 @@ jobs:
       contents: write
       packages: write
       id-token: write
-    concurrency:
-      group: deploy-${{ github.repository }}
-      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v6
 
