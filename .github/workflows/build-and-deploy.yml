@@ -95,6 +95,7 @@ jobs:
 
           $env:ROUTE_HOST_NAMES = (
               $zoneNames | ForEach-Object {
+                  "  - $_"
                   "  - $env:SUB_DOMAIN.$_"
               }
           ) -join "`n"          
