@@ -12,6 +12,7 @@ env:
   VERSION: '${{ vars.VERSION }}.${{ github.run_number }}.${{ github.run_attempt }}'
   AZURE_GROUP_KUBERNETES: ${{ vars.AZURE_RESOURCE_GROUP_KUBERNETES }}
   AZURE_GROUP_DNS: ${{ vars.AZURE_RESOURCE_GROUP_DNS }}
+  AZURE_GROUP_DELIVERY: ${{ vars.AZURE_RESOURCE_GROUP_DELIVERY }}
   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -51,12 +52,12 @@ jobs:
       - name: Build and Push Image
         shell: pwsh
         run: |
-          $env:CONTAINER_REGISTRY_HOST = az acr list -g Nano-Delivery --query [0].loginServer -o tsv;
+          $env:CONTAINER_REGISTRY_HOST = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].loginServer -o tsv;
 
           az acr build `
               --registry $env:CONTAINER_REGISTRY_HOST `
-              --image "$($env:IMAGE_NAME):latest" `
-              --image "$($env:IMAGE_NAME):$($env:VERSION)" `
+              -t "$($env:IMAGE_NAME):latest" `
+              -t "$($env:IMAGE_NAME):$($env:VERSION)" `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
               ./
 
@@ -68,7 +69,8 @@ jobs:
       - name: Kubernetes Deploy
         shell: pwsh
         run: |
-          $env:CONTAINER_REGISTRY_HOST = az acr list -g Nano-Delivery --query [0].loginServer -o tsv;
+          $env:GATEWAY_NAME = kubectl get gateway -n apps -o jsonpath='{.items[0].metadata.name}'
+          $env:CONTAINER_REGISTRY_HOST = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].loginServer -o tsv;
 
           $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
 
@@ -78,8 +80,6 @@ jobs:
                   "  - $env:SUB_DOMAIN.$_"
               }
           ) -join "`n"          
-
-          $env:GATEWAY_NAME = kubectl get gateway -n apps -o jsonpath='{.items[0].metadata.name}'
 
           Get-Content .kubernetes/service.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/service.tmp.yaml;
           kubectl apply -f .kubernetes/service.tmp.yaml;
