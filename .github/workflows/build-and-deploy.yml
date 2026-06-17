@@ -16,8 +16,6 @@ env:
   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   AZURE_SUBSCRIPTION_ID: ${{ github.ref == 'refs/heads/master' && secrets.PRODUCTION_AZURE_SUBSCRIPTION_ID || secrets.STAGING_AZURE_SUBSCRIPTION_ID }}
-  CONTAINER_REGISTRY_HOST: nanoproductioncontainerregistry.azurecr.io
-  CONTAINER_REGISTRY_SOURCE_LABEL: https://github.com/${{ github.repository }}
   KUBERNETES_NODEPOOL_COMPUTE: cpu
   KUBERNETES_NAMESPACE: ${{ vars.KUBERNETES_NAMESPACE }}
   KUBERNETES_REPLICA_COUNT: ${{ github.ref == 'refs/heads/master' && 2 || 1 }}
@@ -53,11 +51,13 @@ jobs:
       - name: Build and Push Image
         shell: pwsh
         run: |
+          $env:CONTAINER_REGISTRY_HOST = az acr list -g Nano-Delivery --query [0].loginServer -o tsv;
+
           az acr build `
               --registry $env:CONTAINER_REGISTRY_HOST `
               --image "$($env:IMAGE_NAME):latest" `
               --image "$($env:IMAGE_NAME):$($env:VERSION)" `
-              --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=$env:CONTAINER_REGISTRY_SOURCE_LABEL `
+              --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY
               ./
 
           if ($LastExitCode -ne 0) 
@@ -68,6 +68,8 @@ jobs:
       - name: Kubernetes Deploy
         shell: pwsh
         run: |
+          $env:CONTAINER_REGISTRY_HOST = az acr list -g Nano-Delivery --query [0].loginServer -o tsv;
+
           $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
 
           $env:ROUTE_HOST_NAMES = (
