@@ -16,9 +16,7 @@ env:
   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   AZURE_SUBSCRIPTION_ID: ${{ github.ref == 'refs/heads/master' && secrets.PRODUCTION_AZURE_SUBSCRIPTION_ID || secrets.STAGING_AZURE_SUBSCRIPTION_ID }}
-  CONTAINER_REGISTRY_HOST: ghcr.io
-  CONTAINER_REGISTRY_USERNAME: ${{ github.actor }}
-  CONTAINER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  CONTAINER_REGISTRY_HOST: nanoproductioncontainerregistr.azurecr.io
   CONTAINER_REGISTRY_SOURCE_LABEL: https://github.com/${{ github.repository }}
   KUBERNETES_NODEPOOL_COMPUTE: cpu
   KUBERNETES_NAMESPACE: ${{ vars.KUBERNETES_NAMESPACE }}
@@ -41,26 +39,28 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Publish Image
+      - name: Azure Login
         shell: pwsh
         run: |
-          $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
+          az login --service-principal -u $env:AZURE_CLIENT_ID -p $env:AZURE_CLIENT_SECRET --tenant $env:AZURE_TENANT_ID -o none;
+          az account set -s $env:AZURE_SUBSCRIPTION_ID -o none;
 
+      - name: Build and Push Image
+        shell: pwsh
+        run: |
           docker build `
-              -t "$($env:FULL_IMAGE_NAME):latest" `
-              -t "$($env:FULL_IMAGE_NAME):$($env:VERSION)" `
+              -t "$env:CONTAINER_REGISTRY_HOST/nanoignite:latest" `
+              -t "$env:CONTAINER_REGISTRY_HOST/nanoignite:$($env:VERSION)" `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=$env:CONTAINER_REGISTRY_SOURCE_LABEL `
-              ./;
+              ./
 
           if ($LastExitCode -ne 0) 
           { 
-              throw "error";
-          };
+              throw "Build failed" 
+          }
 
-          echo $env:CONTAINER_REGISTRY_PASSWORD | docker login $env:CONTAINER_REGISTRY_HOST -u $env:CONTAINER_REGISTRY_USERNAME --password-stdin;
-
-          docker push "$($env:FULL_IMAGE_NAME):latest";
-          docker push "$($env:FULL_IMAGE_NAME):$($env:VERSION)";
+          docker push "$env:CONTAINER_REGISTRY_HOST/nanoignite:latest"
+          docker push "$env:CONTAINER_REGISTRY_HOST/nanoignite:$($env:VERSION)"
 
           if ($LastExitCode -ne 0) 
           { 
@@ -89,7 +89,7 @@ jobs:
       - name: Kubernetes Deploy
         shell: pwsh
         run: |
-          $env:FULL_IMAGE_NAME = $env:CONTAINER_REGISTRY_HOST + "/" + "${{ github.repository_owner }}".ToLower() + "/" + $env:IMAGE_NAME;
+          $env:FULL_IMAGE_NAME = "$env:CONTAINER_REGISTRY_HOST/$env:IMAGE_NAME";
 
           $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
 
