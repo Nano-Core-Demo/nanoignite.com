@@ -57,7 +57,7 @@ jobs:
               --registry $env:CONTAINER_REGISTRY_HOST `
               --image "$($env:IMAGE_NAME):latest" `
               --image "$($env:IMAGE_NAME):$($env:VERSION)" `
-              --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY
+              --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
               ./
 
           if ($LastExitCode -ne 0) 
