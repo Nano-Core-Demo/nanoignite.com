@@ -27,7 +27,6 @@ env:
   KUBERNETES_CPU_REQUEST: 50m
   KUBERNETES_CPU_LIMIT: 150m
   SUB_DOMAIN: web
-  FULL_IMAGE_NAME: ${{ env.CONTAINER_REGISTRY_HOST }}/${{ env.IAMGE_NAME }}  
 concurrency:
   group: ${{ github.workflow }}-${{ github.repository }}
   cancel-in-progress: true
