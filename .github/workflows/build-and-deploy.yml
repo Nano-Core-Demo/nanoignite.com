@@ -73,7 +73,7 @@ jobs:
       - self-hosted
       - linux 
       - ${{ github.ref == 'refs/heads/master' && 'Production' || 'Staging' }}
-    needs: build
+    #needs: build
     permissions:
       contents: write
     steps:
