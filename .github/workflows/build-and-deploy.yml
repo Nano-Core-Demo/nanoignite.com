@@ -49,8 +49,8 @@ jobs:
         shell: pwsh
         run: |
           docker build `
-              -t "$env:CONTAINER_REGISTRY_HOST/$env:IMAGE_NAME:latest" `
-              -t "$env:CONTAINER_REGISTRY_HOST/$env:IMAGE_NAME:$($env:VERSION)" `
+              -t "$env:CONTAINER_REGISTRY_HOST/$($env:IMAGE_NAME):latest" `
+              -t "$env:CONTAINER_REGISTRY_HOST/$($env:IMAGE_NAME):$($env:VERSION)" `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=$env:CONTAINER_REGISTRY_SOURCE_LABEL `
               ./
 
@@ -59,8 +59,8 @@ jobs:
               throw "error";
           }
 
-          docker push "$env:CONTAINER_REGISTRY_HOST/$env:IMAGE_NAME:latest"
-          docker push "$env:CONTAINER_REGISTRY_HOST/$env:IMAGE_NAME:$($env:VERSION)"
+          docker push "$env:CONTAINER_REGISTRY_HOST/$($env:IMAGE_NAME):latest"
+          docker push "$env:CONTAINER_REGISTRY_HOST/$($env:IMAGE_NAME):$($env:VERSION)"
 
           if ($LastExitCode -ne 0) 
           { 
