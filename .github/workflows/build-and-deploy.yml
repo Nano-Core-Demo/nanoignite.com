@@ -16,7 +16,7 @@ env:
   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
   AZURE_SUBSCRIPTION_ID: ${{ github.ref == 'refs/heads/master' && secrets.PRODUCTION_AZURE_SUBSCRIPTION_ID || secrets.STAGING_AZURE_SUBSCRIPTION_ID }}
-  CONTAINER_REGISTRY_HOST: nanoproductioncontainerregistr.azurecr.io
+  CONTAINER_REGISTRY_HOST: nanoproductioncontainerregistry.azurecr.io
   CONTAINER_REGISTRY_SOURCE_LABEL: https://github.com/${{ github.repository }}
   KUBERNETES_NODEPOOL_COMPUTE: cpu
   KUBERNETES_NAMESPACE: ${{ vars.KUBERNETES_NAMESPACE }}
@@ -49,18 +49,18 @@ jobs:
         shell: pwsh
         run: |
           docker build `
-              -t "$env:CONTAINER_REGISTRY_HOST/nanoignite:latest" `
-              -t "$env:CONTAINER_REGISTRY_HOST/nanoignite:$($env:VERSION)" `
+              -t "$env:CONTAINER_REGISTRY_HOST/$env:IMAGE_NAME:latest" `
+              -t "$env:CONTAINER_REGISTRY_HOST/$env:IMAGE_NAME:$($env:VERSION)" `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=$env:CONTAINER_REGISTRY_SOURCE_LABEL `
               ./
 
           if ($LastExitCode -ne 0) 
           { 
-              throw "Build failed" 
+              throw "error";
           }
 
-          docker push "$env:CONTAINER_REGISTRY_HOST/nanoignite:latest"
-          docker push "$env:CONTAINER_REGISTRY_HOST/nanoignite:$($env:VERSION)"
+          docker push "$env:CONTAINER_REGISTRY_HOST/$env:IMAGE_NAME:latest"
+          docker push "$env:CONTAINER_REGISTRY_HOST/$env:IMAGE_NAME:$($env:VERSION)"
 
           if ($LastExitCode -ne 0) 
           { 
