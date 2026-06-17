@@ -30,7 +30,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.repository }}
   cancel-in-progress: true
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on:
       - self-hosted
       - linux 
