@@ -7,7 +7,8 @@ spec:
   parentRefs:
     - name: %GATEWAY_NAME%
   hostnames:
-%ROUTE_HOST_NAMES%
+    - nano-ignite.com
+    - www.nano-ignite.com
   rules:
     - matches:
         - path:
