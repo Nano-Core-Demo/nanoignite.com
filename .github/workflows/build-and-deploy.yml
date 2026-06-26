@@ -52,21 +52,21 @@ jobs:
       - name: Build and Push Image
         shell: pwsh
         run: |
-          apt-get update -y;
-          apt-get install -y podman;
+          sudo apt-get update -y
+          sudo apt-get install -y podman
 
-          $env:ACCESS_TOKEN = az acr login --name $env:CONTAINER_REGISTRY_HOST --expose-token --query accessToken -o tsv;
-    
-          podman login $env:CONTAINER_REGISTRY_HOST --username 00000000-0000-0000-0000-000000000000 --password $env:ACCESS_TOKEN;
+          $env:ACCESS_TOKEN = az acr login --name $env:CONTAINER_REGISTRY_NAME --expose-token --query accessToken -o tsv;
 
-          podman build `
+          echo $env:ACCESS_TOKEN | sudo podman login $env:CONTAINER_REGISTRY_HOST --username 00000000-0000-0000-0000-000000000000 --password-stdin;
+
+          sudo podman build `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
               -t "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):latest" `
               -t "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):$($env:VERSION)" `
               .;
 
-          podman push "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):latest";
-          podman push "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):$($env:VERSION)";
+          sudo podman push "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):latest";
+          sudo podman push "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):$($env:VERSION)";
 
           # $env:CONTAINER_REGISTRY_HOST = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].loginServer -o tsv;
 
