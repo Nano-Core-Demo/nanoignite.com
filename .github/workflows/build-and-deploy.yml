@@ -39,17 +39,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Debug DNS
-        shell: bash
-        run: |
-          nslookup nanoproductioncontainerregistry.azurecr.io
-
-      - name: Install Podman
-        shell: bash
-        run: |
-          apt-get update -y
-          apt-get install -y podman
-
       - name: Azure Login
         shell: pwsh
         run: |
@@ -63,14 +52,30 @@ jobs:
       - name: Build and Push Image
         shell: pwsh
         run: |
-          $env:CONTAINER_REGISTRY_HOST = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].loginServer -o tsv;
+          apt-get update -y;
+          apt-get install -y podman;
 
-          az acr build `
-              --registry $env:CONTAINER_REGISTRY_HOST `
-              -t "$($env:IMAGE_NAME):latest" `
-              -t "$($env:IMAGE_NAME):$($env:VERSION)" `
+          $env:ACCESS_TOKEN = az acr login --name $env:CONTAINER_REGISTRY_HOST --expose-token --query accessToken -o tsv;
+    
+          podman login $env:CONTAINER_REGISTRY_HOST --username 00000000-0000-0000-0000-000000000000 --password $env:ACCESS_TOKEN;
+
+          podman build `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
-              ./
+              -t "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):latest" `
+              -t "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):$($env:VERSION)" `
+              .;
+
+          podman push "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):latest";
+          podman push "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):$($env:VERSION)";
+
+          # $env:CONTAINER_REGISTRY_HOST = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].loginServer -o tsv;
+
+          # az acr build `
+          #     --registry $env:CONTAINER_REGISTRY_HOST `
+          #     -t "$($env:IMAGE_NAME):latest" `
+          #     -t "$($env:IMAGE_NAME):$($env:VERSION)" `
+          #     --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
+          #     ./
 
           if ($LastExitCode -ne 0) 
           { 
