@@ -52,9 +52,6 @@ jobs:
       - name: Build and Push Image
         shell: pwsh
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y podman
-
           $env:ACCESS_TOKEN = az acr login --name $env:CONTAINER_REGISTRY_NAME --expose-token --query accessToken -o tsv;
 
           echo $env:ACCESS_TOKEN | sudo podman login $env:CONTAINER_REGISTRY_HOST --username 00000000-0000-0000-0000-000000000000 --password-stdin;
