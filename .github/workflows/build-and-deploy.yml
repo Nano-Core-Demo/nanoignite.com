@@ -55,7 +55,8 @@ jobs:
           $env:CONTAINER_REGISTRY_NAME = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].name -o tsv;
 
           az acr build `
-              --registry $env:CONTAINER_REGISTRY_NAME `
+              -r $env:CONTAINER_REGISTRY_NAME `
+              --agent-pool buildpool `
               -t "$($env:IMAGE_NAME):latest" `
               -t "$($env:IMAGE_NAME):$($env:VERSION)" `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
