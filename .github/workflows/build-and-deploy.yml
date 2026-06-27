@@ -59,6 +59,7 @@ jobs:
           echo $env:ACCESS_TOKEN | podman login $env:CONTAINER_REGISTRY_HOST --username 00000000-0000-0000-0000-000000000000 --password-stdin;
 
           podman build `
+              --isolation chroot `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
               -t "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):latest" `
               -t "$($env:CONTAINER_REGISTRY_HOST)/$($env:IMAGE_NAME):$($env:VERSION)" `
