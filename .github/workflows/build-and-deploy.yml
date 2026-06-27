@@ -55,6 +55,7 @@ jobs:
           $env:CONTAINER_REGISTRY_NAME = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].name -o tsv;
 
           az acr build `
+              --auth-mode None `
               --registry $env:CONTAINER_REGISTRY_NAME `
               -t "$($env:IMAGE_NAME):latest" `
               -t "$($env:IMAGE_NAME):$($env:VERSION)" `
