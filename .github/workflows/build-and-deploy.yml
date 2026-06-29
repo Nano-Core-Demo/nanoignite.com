@@ -56,7 +56,6 @@ jobs:
 
           az acr build `
               -r $env:CONTAINER_REGISTRY_NAME `
-              --agent-pool buildpool `
               -t "$($env:IMAGE_NAME):latest" `
               -t "$($env:IMAGE_NAME):$($env:VERSION)" `
               --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
