@@ -54,6 +54,7 @@ jobs:
         run: |
           $env:CONTAINER_REGISTRY_NAME = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].name -o tsv;
 
+          #--agent-pool buildpool `
           az acr build `
               -r $env:CONTAINER_REGISTRY_NAME `
               -t "$($env:IMAGE_NAME):latest" `
