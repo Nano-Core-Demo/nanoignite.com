@@ -351,7 +351,7 @@ nav {
 .form-group textarea { resize: vertical; min-height: 100px; }
 .form-group select option { background: var(--bg2); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.form-submit { width: 100%; padding: 14px; font-size: 15px; margin-top: 8px; }
+.form-submit { width: 40%; padding: 14px; font-size: 15px; margin-top: 8px; justify-content: center; }
 .form-success-msg {
   display: none; margin-top: 24px; padding: 18px;
   background: rgba(26,143,255,0.08); border: 1px solid var(--border);
